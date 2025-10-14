@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Start Ollama in the background
+/bin/ollama serve &
+
+# Wait for Ollama to be ready
+echo "Waiting for Ollama to start..."
+sleep 5
+
+# Pull the model
+echo "Pulling model: ${OLLAMA_MODEL:-llama3.2:latest}"
+ollama pull ${OLLAMA_MODEL:-llama3.2:latest}
+
+echo "Model ready! Ollama is now serving requests."
+
+# Keep the container running
+wait

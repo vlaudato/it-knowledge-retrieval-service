@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: rag-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      containers:
+      - name: ollama
+        image: ollama/ollama:latest
+        ports:
+        - containerPort: 11434
+          name: http
+        envFrom:
+        - configMapRef:
+            name: rag-config
+        volumeMounts:
+        - name: ollama-data
+          mountPath: /root/.ollama
+        - name: init-script
+          mountPath: /ollama-init.sh
+          subPath: ollama-init.sh
+        command: ["/bin/bash", "/ollama-init.sh"]
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "ollama list | grep llama3.2"
+          initialDelaySeconds: 300
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 5
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - "ollama list | grep llama3.2"
+          initialDelaySeconds: 300
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 60
+      volumes:
+      - name: ollama-data
+        persistentVolumeClaim:
+          claimName: ollama-data
+      - name: init-script
+        configMap:
+          name: ollama-init-script
+          defaultMode: 0755
