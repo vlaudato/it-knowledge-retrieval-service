@@ -49,6 +49,13 @@ spec:
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 60
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "1000m"
+          limits:
+            memory: "6Gi"
+            cpu: "2000m"
       volumes:
       - name: ollama-data
         persistentVolumeClaim:

@@ -5,8 +5,12 @@ metadata:
   namespace: rag-system
 data:
   EMBEDDING_MODEL: "Qwen/Qwen3-Embedding-0.6B"
+  RERANKER_MODEL: "Qwen/Qwen3-Reranker-0.6B"
+  RERANKER_ENABLED: "false"
+  INITIAL_RETRIEVAL_COUNT: "20"
+  FINAL_RESULT_COUNT: "5"
   LLM_MODEL: "llama3.2:latest"
-  VECTOR_TABLE_NAME: "documents"
+  VECTOR_TABLE_NAME: "it_docs_embeddings"
   MATCH_THRESHOLD: "0.7"
   MATCH_COUNT: "3"
   FLASK_ENV: "production"
