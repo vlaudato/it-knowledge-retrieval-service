@@ -1,9 +1,0 @@
-flask
-flask-cors
-sentence-transformers
-supabase
-python-dotenv
-requests
-torch
-transformers
-huggingface-hub

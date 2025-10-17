@@ -16,9 +16,15 @@ class Config:
     # Models
     EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL', 'Qwen/Qwen3-Embedding-0.6B')
     LLM_MODEL = os.getenv('LLM_MODEL', 'llama3.2:latest')
+    RERANKER_MODEL = os.getenv('RERANKER_MODEL', 'Qwen/Qwen3-Reranker-0.6B')
+    
+    # Reranking
+    RERANKER_ENABLED = os.getenv('RERANKER_ENABLED', 'true').lower() == 'true'
+    INITIAL_RETRIEVAL_COUNT = int(os.getenv('INITIAL_RETRIEVAL_COUNT', '20'))
+    FINAL_RESULT_COUNT = int(os.getenv('FINAL_RESULT_COUNT', '5'))
     
     # Database
-    VECTOR_TABLE_NAME = os.getenv('VECTOR_TABLE_NAME', 'documents')
+    VECTOR_TABLE_NAME = os.getenv('VECTOR_TABLE_NAME', 'it_docs_embeddings')
     MATCH_THRESHOLD = float(os.getenv('MATCH_THRESHOLD', '0.7'))
     MATCH_COUNT = int(os.getenv('MATCH_COUNT', '3'))
     

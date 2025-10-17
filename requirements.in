@@ -1,0 +1,21 @@
+# Web Framework
+flask
+flask-cors
+
+# ML/AI Libraries
+sentence-transformers
+torch
+transformers
+huggingface-hub
+
+# Database & API Clients
+supabase
+requests
+
+# Configuration
+python-dotenv>=1.0
+
+# Testing
+pytest
+pytest-cov
+pytest-mock

@@ -43,3 +43,6 @@ Thumbs.db
 # Model cache
 models/
 .cache/
+
+# Other
+PROJECT_ANALYSIS.md

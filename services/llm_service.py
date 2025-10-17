@@ -1,5 +1,6 @@
 import requests
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Iterator
+import json
 
 
 class LLMService:
@@ -42,9 +43,9 @@ class LLMService:
         system_prompt = """
         You are a helpful AI assistant that answers questions based on the provided context.
         Use the context below to answer the user's question accurately and concisely.
-        If the context doesn't contain enough information to answer the question, say so honestl and
-        reply that you do not know the answer. Base your answers solelz on the provided context.
-        Be as concise as possible and trz to answer in maximum two paragraphs."""
+        If the context doesn't contain enough information to answer the question, say so honestly and
+        reply that you do not know the answer. Base your answers solely on the provided context.
+        Be as concise as possible and try to answer in maximum two paragraphs."""
 
         user_prompt = f"""Context:
         {context}
@@ -78,6 +79,76 @@ class LLMService:
             
         except Exception as e:
             print(f"Error generating answer: {str(e)}")
+            raise
+    
+    def generate_answer_stream(
+        self, 
+        question: str, 
+        context_documents: List[Dict[str, Any]],
+        temperature: float = 1.0
+    ) -> Iterator[str]:
+        """
+        Generate an answer with streaming (yields chunks as they arrive)
+        
+        Args:
+            question: User's question
+            context_documents: List of relevant documents from vector search
+            temperature: Sampling temperature (0-1)
+            
+        Yields:
+            Text chunks as they are generated
+        """
+        # Build context from retrieved documents
+        context = self._build_context(context_documents)
+        
+        # Create the prompt
+        system_prompt = """
+        You are a helpful AI assistant that answers questions based on the provided context.
+        Use the context below to answer the user's question accurately and concisely.
+        If the context doesn't contain enough information to answer the question, say so honestly and
+        reply that you do not know the answer. Base your answers solely on the provided context.
+        Be as concise as possible and try to answer in maximum two paragraphs."""
+
+        user_prompt = f"""Context:
+        {context}
+
+        Question: {question}
+
+        Answer:"""
+
+        try:
+            # Combine system prompt and user prompt for Ollama
+            full_prompt = f"{system_prompt}\n\n{user_prompt}"
+            
+            # Call Ollama API with streaming
+            response = requests.post(
+                f"{self.ollama_url}/api/generate",
+                json={
+                    "model": self.model,
+                    "prompt": full_prompt,
+                    "stream": True,
+                    "options": {
+                        "temperature": temperature
+                    }
+                },
+                stream=True,
+                timeout=180
+            )
+            
+            response.raise_for_status()
+            
+            # Stream the response
+            for line in response.iter_lines():
+                if line:
+                    try:
+                        chunk = json.loads(line)
+                        if 'response' in chunk:
+                            yield chunk['response']
+                    except json.JSONDecodeError:
+                        continue
+                        
+        except Exception as e:
+            print(f"Error generating answer stream: {str(e)}")
             raise
     
     def _build_context(self, documents: List[Dict[str, Any]]) -> str:
